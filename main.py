@@ -4,6 +4,7 @@ import requests
 import xmltodict
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask_cors import CORS
 from colorama import Fore, Style, init
 
 # Initialize colorama
@@ -14,6 +15,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)  # CORS 활성화
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 
 # OpenAI 클라이언트 초기화 부분 주석 처리 (테스트를 위해)
@@ -39,8 +41,21 @@ class BookstoreAPI:
             params["keyword"] = keyword
         
         try:
-            response = requests.get(self.base_url, params=params)
-            response.raise_for_status()
+            # 디버깅을 위한 로그 추가
+            print(f"API 요청 URL: {self.base_url}")
+            print(f"API 요청 파라미터: {params}")
+            
+            # 타임아웃 설정 추가
+            response = requests.get(self.base_url, params=params, timeout=10)
+            
+            # 응답 상태 코드 확인
+            print(f"API 응답 상태 코드: {response.status_code}")
+            
+            if response.status_code != 200:
+                return {"error": f"API 서버 오류: 상태 코드 {response.status_code}"}
+            
+            # 응답 내용 확인 (디버깅용)
+            print(f"API 응답 내용 일부: {response.text[:200]}...")
             
             # XML을 딕셔너리로 변환
             data = xmltodict.parse(response.text)
@@ -73,9 +88,13 @@ class BookstoreAPI:
             
             return {"error": "API 응답 형식이 올바르지 않습니다."}
             
+        except requests.exceptions.Timeout:
+            return {"error": "API 서버 응답 시간 초과. 잠시 후 다시 시도해주세요."}
         except requests.exceptions.RequestException as e:
+            print(f"API 요청 오류: {str(e)}")
             return {"error": "네트워크 오류: API 서버에 연결할 수 없습니다."}
         except Exception as e:
+            print(f"처리 중 오류 발생: {str(e)}")
             return {"error": f"처리 중 오류가 발생했습니다: {str(e)}"}
     
     def get_bookstore_details(self, store_id):
@@ -173,15 +192,30 @@ def search():
     if not keyword:
         return jsonify({"error": "검색어를 입력해주세요."})
     
+    # 디버깅 메시지 추가
+    print(f"검색 요청: 키워드='{keyword}', 페이지={page}")
+    
+    # 테스트용 더미 데이터 (API가 작동하지 않을 경우 사용)
+    use_dummy_data = os.getenv("USE_DUMMY_DATA", "false").lower() == "true"
+    
+    if use_dummy_data:
+        print("더미 데이터 사용 중...")
+        dummy_data = get_dummy_data(keyword)
+        return jsonify(dummy_data)
+    
+    # 실제 API 호출
     result = api.search_bookstores(keyword=keyword, page_no=page)
     
     if "error" in result:
+        print(f"검색 오류: {result['error']}")
         return jsonify({"error": result["error"], "suggestion": get_search_suggestion()})
     
     # 검색 결과 포맷팅
     formatted_stores = []
     for store in result["stores"]:
         formatted_stores.append(format_bookstore_info(store))
+    
+    print(f"검색 결과: {len(formatted_stores)}개 항목 찾음")
     
     # AI 분석 비활성화
     ai_analysis = "AI 분석 기능이 비활성화되었습니다. 검색 결과만 표시합니다."
@@ -201,6 +235,41 @@ def get_search_suggestion():
             "'강남' (O), '강남구' (X)",
             "'서울', '부산'과 같은 도시명"
         ]
+    }
+
+def get_dummy_data(keyword):
+    """테스트용 더미 데이터를 반환합니다."""
+    dummy_stores = [
+        {
+            "title": f"{keyword} 북카페",
+            "address": "서울특별시 강남구 테헤란로 123",
+            "contact": "02-123-4567",
+            "description": "아늑한 분위기의 북카페입니다. 다양한 책과 함께 커피를 즐길 수 있습니다.",
+            "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공",
+            "coordinates": "37.123456,127.123456"
+        },
+        {
+            "title": f"책과 커피 {keyword}점",
+            "address": "서울특별시 마포구 홍대로 456",
+            "contact": "02-456-7890",
+            "description": "다양한 장르의 책과 맛있는 커피를 함께 즐길 수 있는 공간입니다.",
+            "sub_description": "영업시간: 11:00-23:00, 주차 불가, 와이파이 제공, 콘센트 완비",
+            "coordinates": "37.654321,127.654321"
+        },
+        {
+            "title": f"북스토리 {keyword}",
+            "address": "서울특별시 종로구 인사동길 789",
+            "contact": "02-789-0123",
+            "description": "전통과 현대가 어우러진 공간에서 책과 차를 즐길 수 있습니다.",
+            "sub_description": "영업시간: 09:00-21:00, 주차 가능(유료), 와이파이 제공, 전통차 전문",
+            "coordinates": "37.987654,127.987654"
+        }
+    ]
+    
+    return {
+        "stores": dummy_stores,
+        "total_count": len(dummy_stores),
+        "ai_analysis": f"'{keyword}'에 대한 검색 결과입니다. 더미 데이터를 사용하고 있습니다."
     }
 
 def get_ai_analysis(keyword, stores):

@@ -4,4 +4,5 @@ openai==1.3.0
 requests==2.31.0
 xmltodict==0.13.0
 colorama==0.4.6
-gunicorn==21.2.0 
+gunicorn==21.2.0
+flask-cors==4.0.0 
