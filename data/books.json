@@ -1,0 +1,79 @@
+{
+    "books": [
+        {
+            "id": "1",
+            "title": "데미안",
+            "author": "헤르만 헤세",
+            "category": "소설",
+            "subcategory": "외국소설",
+            "price": 12000,
+            "description": "자아의 발견과 성장을 다룬 헤르만 헤세의 대표작",
+            "publisher": "민음사",
+            "publication_date": "2009-03-03",
+            "isbn": "9788937460449",
+            "stock": 5,
+            "location": "1층 문학-3",
+            "rating": 4.5
+        },
+        {
+            "id": "2",
+            "title": "사피엔스",
+            "author": "유발 하라리",
+            "category": "역사",
+            "subcategory": "세계사",
+            "price": 22000,
+            "description": "인류의 역사를 다룬 세계적 베스트셀러",
+            "publisher": "김영사",
+            "publication_date": "2015-11-23",
+            "isbn": "9788934972464",
+            "stock": 8,
+            "location": "2층 인문-1",
+            "rating": 4.8
+        },
+        {
+            "id": "3",
+            "title": "클린 코드",
+            "author": "로버트 C. 마틴",
+            "category": "프로그래밍",
+            "subcategory": "소프트웨어 공학",
+            "price": 33000,
+            "description": "더 나은 프로그래밍을 위한 실천 방법",
+            "publisher": "인사이트",
+            "publication_date": "2013-12-24",
+            "isbn": "9788966260959",
+            "stock": 3,
+            "location": "2층 전문서적-2",
+            "rating": 4.7
+        },
+        {
+            "id": "4",
+            "title": "아몬드",
+            "author": "손원평",
+            "category": "소설",
+            "subcategory": "한국소설",
+            "price": 12000,
+            "description": "감정을 느끼지 못하는 소년의 특별한 성장기",
+            "publisher": "창비",
+            "publication_date": "2017-03-31",
+            "isbn": "9788936434267",
+            "stock": 6,
+            "location": "1층 문학-1",
+            "rating": 4.6
+        },
+        {
+            "id": "5",
+            "title": "부의 추월차선",
+            "author": "엠제이 드마코",
+            "category": "경제경영",
+            "subcategory": "재테크",
+            "price": 15000,
+            "description": "부자들이 말하지 않는 진정한 부를 얻는 방법",
+            "publisher": "청림출판",
+            "publication_date": "2013-01-20",
+            "isbn": "9788935210176",
+            "stock": 4,
+            "location": "2층 전문서적-4",
+            "rating": 4.4
+        }
+    ]
+} 

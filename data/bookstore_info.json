@@ -1,0 +1,65 @@
+{
+    "store_info": {
+        "name": "책과 커피",
+        "address": "서울특별시 마포구 월드컵북로 21",
+        "tel": "02-1234-5678",
+        "operating_hours": {
+            "weekday": "09:00-22:00",
+            "weekend": "10:00-22:00",
+            "holiday": "10:00-21:00"
+        },
+        "facilities": [
+            "카페",
+            "무선 인터넷",
+            "주차장",
+            "독서공간",
+            "문화공간"
+        ],
+        "cafe_seats": 30,
+        "parking_lots": 20
+    },
+    "sections": [
+        {
+            "id": "1",
+            "name": "문학",
+            "floor": 1,
+            "description": "국내외 소설, 시, 에세이"
+        },
+        {
+            "id": "2",
+            "name": "인문/사회",
+            "floor": 2,
+            "description": "철학, 역사, 사회과학"
+        },
+        {
+            "id": "3",
+            "name": "전문서적",
+            "floor": 2,
+            "description": "컴퓨터, 과학, 경제경영"
+        },
+        {
+            "id": "4",
+            "name": "카페",
+            "floor": 1,
+            "description": "음료와 디저트를 즐길 수 있는 공간"
+        }
+    ],
+    "events": [
+        {
+            "id": "1",
+            "name": "저자와의 만남",
+            "date": "2024-03-30",
+            "time": "19:00-21:00",
+            "location": "2층 문화공간",
+            "description": "이달의 신간 저자 강연회"
+        },
+        {
+            "id": "2",
+            "name": "독서모임",
+            "date": "매주 토요일",
+            "time": "14:00-16:00",
+            "location": "1층 독서공간",
+            "description": "함께 읽고 이야기 나누는 독서 모임"
+        }
+    ]
+} 
