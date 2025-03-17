@@ -134,11 +134,24 @@ document.addEventListener('DOMContentLoaded', function() {
         title.textContent = store.title;
         cardBody.appendChild(title);
         
-        // 주소
+        // 주소 (네이버 지도 링크 추가)
         if (store.address) {
             const address = document.createElement('p');
             address.className = 'card-text';
-            address.innerHTML = '<span class="store-info-label">📍 주소:</span>' + store.address;
+            
+            const addressLabel = document.createElement('span');
+            addressLabel.className = 'store-info-label';
+            addressLabel.innerHTML = '📍 주소: ';
+            
+            const addressLink = document.createElement('a');
+            addressLink.href = `https://map.naver.com/v5/search/${encodeURIComponent(store.address)}`;
+            addressLink.target = '_blank';
+            addressLink.className = 'map-link';
+            addressLink.textContent = store.address;
+            addressLink.title = '네이버 지도에서 보기';
+            
+            address.appendChild(addressLabel);
+            address.appendChild(addressLink);
             cardBody.appendChild(address);
         }
         
@@ -182,6 +195,21 @@ document.addEventListener('DOMContentLoaded', function() {
             detailsContainer.appendChild(detailsButton);
             detailsContainer.appendChild(detailsContent);
             cardBody.appendChild(detailsContainer);
+        }
+        
+        // 지도 버튼 추가
+        if (store.address) {
+            const mapButtonContainer = document.createElement('div');
+            mapButtonContainer.className = 'mt-3';
+            
+            const mapButton = document.createElement('a');
+            mapButton.className = 'btn btn-sm btn-success';
+            mapButton.href = `https://map.naver.com/v5/search/${encodeURIComponent(store.address)}`;
+            mapButton.target = '_blank';
+            mapButton.innerHTML = '<i class="bi bi-map"></i> 네이버 지도에서 보기';
+            
+            mapButtonContainer.appendChild(mapButton);
+            cardBody.appendChild(mapButtonContainer);
         }
         
         card.appendChild(cardBody);
