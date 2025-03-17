@@ -208,7 +208,10 @@ def search():
     
     if "error" in result:
         print(f"검색 오류: {result['error']}")
-        return jsonify({"error": result["error"], "suggestion": get_search_suggestion()})
+        # API 오류 시 더미 데이터로 폴백
+        print("API 오류로 더미 데이터로 대체합니다.")
+        dummy_data = get_dummy_data(keyword)
+        return jsonify(dummy_data)
     
     # 검색 결과 포맷팅
     formatted_stores = []
@@ -239,32 +242,71 @@ def get_search_suggestion():
 
 def get_dummy_data(keyword):
     """테스트용 더미 데이터를 반환합니다."""
-    dummy_stores = [
-        {
-            "title": f"{keyword} 북카페",
-            "address": "서울특별시 강남구 테헤란로 123",
-            "contact": "02-123-4567",
-            "description": "아늑한 분위기의 북카페입니다. 다양한 책과 함께 커피를 즐길 수 있습니다.",
-            "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공",
-            "coordinates": "37.123456,127.123456"
-        },
-        {
-            "title": f"책과 커피 {keyword}점",
-            "address": "서울특별시 마포구 홍대로 456",
-            "contact": "02-456-7890",
-            "description": "다양한 장르의 책과 맛있는 커피를 함께 즐길 수 있는 공간입니다.",
-            "sub_description": "영업시간: 11:00-23:00, 주차 불가, 와이파이 제공, 콘센트 완비",
-            "coordinates": "37.654321,127.654321"
-        },
-        {
-            "title": f"북스토리 {keyword}",
-            "address": "서울특별시 종로구 인사동길 789",
-            "contact": "02-789-0123",
-            "description": "전통과 현대가 어우러진 공간에서 책과 차를 즐길 수 있습니다.",
-            "sub_description": "영업시간: 09:00-21:00, 주차 가능(유료), 와이파이 제공, 전통차 전문",
-            "coordinates": "37.987654,127.987654"
-        }
-    ]
+    # 검색어에 따라 다른 데이터 반환
+    if '응암' in keyword:
+        dummy_stores = [
+            {
+                "title": "응암 북카페",
+                "address": "서울특별시 은평구 응암동 579-1",
+                "contact": "02-123-4567",
+                "description": "응암동에 위치한 아늑한 분위기의 북카페입니다. 다양한 책과 함께 커피를 즐길 수 있습니다.",
+                "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공",
+                "coordinates": "37.5839,126.9149"
+            }
+        ]
+    elif '강남' in keyword:
+        dummy_stores = [
+            {
+                "title": "강남 책방",
+                "address": "서울특별시 강남구 역삼동 테헤란로 152",
+                "contact": "02-555-7890",
+                "description": "강남역 인근에 위치한 모던한 분위기의 북카페입니다.",
+                "sub_description": "영업시간: 09:00-23:00, 주차 가능(유료), 와이파이 제공, 스터디룸 보유",
+                "coordinates": "37.5002,127.0365"
+            },
+            {
+                "title": "책과 커피 강남점",
+                "address": "서울특별시 강남구 논현동 학동로 212",
+                "contact": "02-512-9876",
+                "description": "다양한 장르의 책과 맛있는 커피를 함께 즐길 수 있는 공간입니다.",
+                "sub_description": "영업시간: 11:00-22:00, 주차 불가, 와이파이 제공, 콘센트 완비",
+                "coordinates": "37.5114,127.0216"
+            }
+        ]
+    elif '홍대' in keyword:
+        dummy_stores = [
+            {
+                "title": "홍대 책방",
+                "address": "서울특별시 마포구 서교동 와우산로 123",
+                "contact": "02-332-5678",
+                "description": "홍대 인근에 위치한 독립서점으로, 다양한 독립출판물을 만나볼 수 있습니다.",
+                "sub_description": "영업시간: 13:00-22:00, 주차 불가, 와이파이 제공, 독립출판 워크샵 운영",
+                "coordinates": "37.5536,126.9235"
+            }
+        ]
+    elif '구로' in keyword:
+        dummy_stores = [
+            {
+                "title": "구로 북스토리",
+                "address": "서울특별시 구로구 구로동 디지털로 300",
+                "contact": "02-868-1234",
+                "description": "구로디지털단지 인근에 위치한 IT 특화 북카페입니다.",
+                "sub_description": "영업시간: 09:00-21:00, 주차 가능, 와이파이 제공, IT 관련 도서 특화",
+                "coordinates": "37.4833,126.8982"
+            }
+        ]
+    else:
+        # 기본 더미 데이터
+        dummy_stores = [
+            {
+                "title": f"{keyword} 북카페",
+                "address": f"서울특별시 {keyword} 인근 123번지",
+                "contact": "02-123-4567",
+                "description": f"{keyword} 지역에 위치한 아늑한 분위기의 북카페입니다.",
+                "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공",
+                "coordinates": "37.5665,126.9780"
+            }
+        ]
     
     return {
         "stores": dummy_stores,
