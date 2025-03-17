@@ -86,13 +86,13 @@ footer {
 
 /* Exit Button */
 .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
+    background-color: #80DEEA;
+    border-color: #80DEEA;
 }
 
 .btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+    background-color: #64B5F6;
+    border-color: #64B5F6;
 }
 
 /* Error Container */
