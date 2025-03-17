@@ -129,4 +129,28 @@ footer {
 .btn-success:hover {
     background-color: #157347;
     border-color: #146c43;
+}
+
+/* Data Source Badge */
+.data-source-badge {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.bg-success {
+    background-color: #198754 !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.text-dark {
+    color: #212529 !important;
 } 

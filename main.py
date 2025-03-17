@@ -195,39 +195,41 @@ def search():
     # 디버깅 메시지 추가
     print(f"검색 요청: 키워드='{keyword}', 페이지={page}")
     
-    # 테스트용 더미 데이터 (API가 작동하지 않을 경우 사용)
+    # 테스트용 더미 데이터 설정 (기본값: false)
     use_dummy_data = os.getenv("USE_DUMMY_DATA", "false").lower() == "true"
     
-    if use_dummy_data:
-        print("더미 데이터 사용 중...")
-        dummy_data = get_dummy_data(keyword)
-        return jsonify(dummy_data)
+    # 실제 API 호출 (더미 데이터 모드가 아닌 경우)
+    if not use_dummy_data:
+        print("실제 API 호출 중...")
+        result = api.search_bookstores(keyword=keyword, page_no=page)
+        
+        # API 호출 성공 시 실제 데이터 반환
+        if "error" not in result:
+            # 검색 결과 포맷팅
+            formatted_stores = []
+            for store in result["stores"]:
+                formatted_stores.append(format_bookstore_info(store))
+            
+            print(f"API 검색 결과: {len(formatted_stores)}개 항목 찾음")
+            
+            # AI 분석 비활성화
+            ai_analysis = "AI 분석 기능이 비활성화되었습니다. 검색 결과만 표시합니다."
+            
+            return jsonify({
+                "stores": formatted_stores,
+                "total_count": result["total_count"],
+                "ai_analysis": ai_analysis,
+                "data_source": "real_api"
+            })
+        else:
+            print(f"API 오류: {result['error']} - 더미 데이터로 폴백")
+    else:
+        print("더미 데이터 모드 활성화됨")
     
-    # 실제 API 호출
-    result = api.search_bookstores(keyword=keyword, page_no=page)
-    
-    if "error" in result:
-        print(f"검색 오류: {result['error']}")
-        # API 오류 시 더미 데이터로 폴백
-        print("API 오류로 더미 데이터로 대체합니다.")
-        dummy_data = get_dummy_data(keyword)
-        return jsonify(dummy_data)
-    
-    # 검색 결과 포맷팅
-    formatted_stores = []
-    for store in result["stores"]:
-        formatted_stores.append(format_bookstore_info(store))
-    
-    print(f"검색 결과: {len(formatted_stores)}개 항목 찾음")
-    
-    # AI 분석 비활성화
-    ai_analysis = "AI 분석 기능이 비활성화되었습니다. 검색 결과만 표시합니다."
-    
-    return jsonify({
-        "stores": formatted_stores,
-        "total_count": result["total_count"],
-        "ai_analysis": ai_analysis
-    })
+    # API 호출 실패 또는 더미 데이터 모드인 경우 더미 데이터 사용
+    dummy_data = get_dummy_data(keyword)
+    dummy_data["data_source"] = "dummy"
+    return jsonify(dummy_data)
 
 def get_search_suggestion():
     """검색 제안을 반환합니다."""
@@ -252,6 +254,22 @@ def get_dummy_data(keyword):
                 "description": "응암동에 위치한 아늑한 분위기의 북카페입니다. 다양한 책과 함께 커피를 즐길 수 있습니다.",
                 "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공",
                 "coordinates": "37.5839,126.9149"
+            },
+            {
+                "title": "응암동 책방",
+                "address": "서울특별시 은평구 응암동 427-5",
+                "contact": "02-372-8901",
+                "description": "조용한 분위기에서 독서를 즐길 수 있는 응암동의 작은 책방입니다.",
+                "sub_description": "영업시간: 11:00-20:00, 주차 불가, 와이파이 제공, 독서모임 운영",
+                "coordinates": "37.5841,126.9152"
+            },
+            {
+                "title": "은평 북스페이스",
+                "address": "서울특별시 은평구 응암로 172",
+                "contact": "02-383-4567",
+                "description": "은평구에 위치한 복합문화공간으로, 책과 함께 다양한 문화 활동을 즐길 수 있습니다.",
+                "sub_description": "영업시간: 09:00-21:00, 주차 가능, 와이파이 제공, 문화 프로그램 운영",
+                "coordinates": "37.5830,126.9160"
             }
         ]
     elif '강남' in keyword:
@@ -271,6 +289,22 @@ def get_dummy_data(keyword):
                 "description": "다양한 장르의 책과 맛있는 커피를 함께 즐길 수 있는 공간입니다.",
                 "sub_description": "영업시간: 11:00-22:00, 주차 불가, 와이파이 제공, 콘센트 완비",
                 "coordinates": "37.5114,127.0216"
+            },
+            {
+                "title": "북스토리 강남",
+                "address": "서울특별시 강남구 삼성동 테헤란로 87길 22",
+                "contact": "02-567-3456",
+                "description": "IT, 경영, 자기계발 서적을 중심으로 한 전문 서점입니다.",
+                "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공, 세미나 공간 대여",
+                "coordinates": "37.5080,127.0579"
+            },
+            {
+                "title": "리딩라운지 강남",
+                "address": "서울특별시 강남구 신사동 가로수길 43",
+                "contact": "02-541-8765",
+                "description": "트렌디한 가로수길에 위치한 감성 북카페입니다.",
+                "sub_description": "영업시간: 12:00-23:00, 주차 불가, 와이파이 제공, 디저트 전문",
+                "coordinates": "37.5209,127.0227"
             }
         ]
     elif '홍대' in keyword:
@@ -282,6 +316,22 @@ def get_dummy_data(keyword):
                 "description": "홍대 인근에 위치한 독립서점으로, 다양한 독립출판물을 만나볼 수 있습니다.",
                 "sub_description": "영업시간: 13:00-22:00, 주차 불가, 와이파이 제공, 독립출판 워크샵 운영",
                 "coordinates": "37.5536,126.9235"
+            },
+            {
+                "title": "아트북스 홍대",
+                "address": "서울특별시 마포구 서교동 어울마당로 92",
+                "contact": "02-323-7890",
+                "description": "예술, 디자인 서적을 전문으로 하는 북카페입니다.",
+                "sub_description": "영업시간: 12:00-22:00, 주차 불가, 와이파이 제공, 아트 전시 공간 운영",
+                "coordinates": "37.5525,126.9245"
+            },
+            {
+                "title": "카페 북스테이",
+                "address": "서울특별시 마포구 연남동 동교로 203",
+                "contact": "02-336-4567",
+                "description": "연남동에 위치한 아늑한 분위기의 북카페입니다.",
+                "sub_description": "영업시간: 11:00-23:00, 주차 불가, 와이파이 제공, 수제 디저트 판매",
+                "coordinates": "37.5605,126.9245"
             }
         ]
     elif '구로' in keyword:
@@ -293,10 +343,61 @@ def get_dummy_data(keyword):
                 "description": "구로디지털단지 인근에 위치한 IT 특화 북카페입니다.",
                 "sub_description": "영업시간: 09:00-21:00, 주차 가능, 와이파이 제공, IT 관련 도서 특화",
                 "coordinates": "37.4833,126.8982"
+            },
+            {
+                "title": "구로 책마을",
+                "address": "서울특별시 구로구 신도림동 경인로 662",
+                "contact": "02-864-5678",
+                "description": "신도림역 인근에 위치한 가족 친화적 북카페입니다.",
+                "sub_description": "영업시간: 10:00-20:00, 주차 가능, 와이파이 제공, 어린이 도서 특화",
+                "coordinates": "37.5087,126.8909"
+            },
+            {
+                "title": "디지털 북센터",
+                "address": "서울특별시 구로구 구로동 디지털로 273",
+                "contact": "02-856-7890",
+                "description": "최신 IT 트렌드와 디지털 관련 서적을 만나볼 수 있는 공간입니다.",
+                "sub_description": "영업시간: 09:00-22:00, 주차 가능, 와이파이 제공, 코딩 스터디 모임 운영",
+                "coordinates": "37.4845,126.8965"
+            }
+        ]
+    elif '서울' in keyword:
+        dummy_stores = [
+            {
+                "title": "서울책방",
+                "address": "서울특별시 중구 세종대로 110",
+                "contact": "02-120",
+                "description": "서울시청 1층에 위치한 공공 북카페로, 서울 관련 도서를 중심으로 다양한 책을 만나볼 수 있습니다.",
+                "sub_description": "영업시간: 09:00-21:00, 주차 가능(유료), 와이파이 제공, 서울 관련 도서 특화",
+                "coordinates": "37.5662,126.9785"
+            },
+            {
+                "title": "서울북스",
+                "address": "서울특별시 종로구 종로 19",
+                "contact": "02-722-5678",
+                "description": "종로에 위치한 대형 서점으로, 다양한 장르의 책과 함께 카페를 운영합니다.",
+                "sub_description": "영업시간: 10:00-22:00, 주차 가능(유료), 와이파이 제공, 문화행사 개최",
+                "coordinates": "37.5707,126.9825"
+            },
+            {
+                "title": "청계천 북카페",
+                "address": "서울특별시 중구 청계천로 40",
+                "contact": "02-2268-7890",
+                "description": "청계천 인근에 위치한 아늑한 분위기의 북카페입니다.",
+                "sub_description": "영업시간: 11:00-21:00, 주차 불가, 와이파이 제공, 청계천 뷰 보유",
+                "coordinates": "37.5689,126.9845"
+            },
+            {
+                "title": "광화문 책사랑",
+                "address": "서울특별시 종로구 세종로 175",
+                "contact": "02-735-4567",
+                "description": "광화문 광장 인근에 위치한 역사, 문화 특화 북카페입니다.",
+                "sub_description": "영업시간: 09:00-20:00, 주차 불가, 와이파이 제공, 역사 관련 도서 특화",
+                "coordinates": "37.5725,126.9768"
             }
         ]
     else:
-        # 기본 더미 데이터
+        # 기본 더미 데이터 (여러 개 생성)
         dummy_stores = [
             {
                 "title": f"{keyword} 북카페",
@@ -305,6 +406,22 @@ def get_dummy_data(keyword):
                 "description": f"{keyword} 지역에 위치한 아늑한 분위기의 북카페입니다.",
                 "sub_description": "영업시간: 10:00-22:00, 주차 가능, 와이파이 제공",
                 "coordinates": "37.5665,126.9780"
+            },
+            {
+                "title": f"책과 커피 {keyword}점",
+                "address": f"서울특별시 {keyword} 인근 456번지",
+                "contact": "02-456-7890",
+                "description": f"{keyword} 지역에서 다양한 장르의 책과 맛있는 커피를 즐길 수 있는 공간입니다.",
+                "sub_description": "영업시간: 11:00-23:00, 주차 불가, 와이파이 제공, 콘센트 완비",
+                "coordinates": "37.5670,126.9785"
+            },
+            {
+                "title": f"{keyword} 리딩라운지",
+                "address": f"서울특별시 {keyword} 인근 789번지",
+                "contact": "02-789-0123",
+                "description": f"{keyword} 지역의 조용한 분위기에서 독서를 즐길 수 있는 공간입니다.",
+                "sub_description": "영업시간: 12:00-21:00, 주차 가능(유료), 와이파이 제공, 독서모임 운영",
+                "coordinates": "37.5675,126.9790"
             }
         ]
     

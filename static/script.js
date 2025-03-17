@@ -104,6 +104,18 @@ document.addEventListener('DOMContentLoaded', function() {
         resultCount.textContent = data.total_count;
         resultsList.innerHTML = '';
         
+        // 데이터 소스 표시
+        const dataSourceBadge = document.createElement('div');
+        dataSourceBadge.className = 'data-source-badge mb-3';
+        
+        if (data.data_source === 'real_api') {
+            dataSourceBadge.innerHTML = '<span class="badge bg-success">실시간 API 데이터</span>';
+        } else {
+            dataSourceBadge.innerHTML = '<span class="badge bg-warning text-dark">테스트용 더미 데이터</span>';
+        }
+        
+        resultsList.appendChild(dataSourceBadge);
+        
         // 서점 정보 카드 생성
         data.stores.forEach(store => {
             const storeCard = createStoreCard(store);
