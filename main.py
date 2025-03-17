@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_cors import CORS
 from colorama import Fore, Style, init
-from openai import OpenAI
 
 # Initialize colorama
 init()
@@ -19,8 +18,15 @@ app = Flask(__name__)
 CORS(app)  # CORS 활성화
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 
-# OpenAI 클라이언트 초기화
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# OpenAI 클라이언트 초기화 (호환성 문제로 인해 try-except로 처리)
+try:
+    from openai import OpenAI
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    print("OpenAI 클라이언트 초기화 성공")
+    openai_available = True
+except Exception as e:
+    print(f"OpenAI 클라이언트 초기화 실패: {str(e)}")
+    openai_available = False
 
 class BookstoreAPI:
     """문화공공데이터 API를 통해 카페가 있는 서점 정보를 가져오는 클래스"""
@@ -446,6 +452,10 @@ def get_dummy_data(keyword):
 def get_ai_analysis(keyword, stores):
     """AI 분석을 요청합니다."""
     try:
+        # OpenAI 사용 불가능한 경우
+        if not openai_available:
+            return "OpenAI API 연결에 문제가 있어 AI 분석을 제공할 수 없습니다."
+        
         # OpenAI API 키가 설정되어 있지 않으면 기본 메시지 반환
         if not os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY") == "your_openai_api_key_here":
             return "AI 분석을 위해 OpenAI API 키가 필요합니다."
