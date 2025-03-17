@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_cors import CORS
 from colorama import Fore, Style, init
+from openai import OpenAI
 
 # Initialize colorama
 init()
@@ -18,8 +19,8 @@ app = Flask(__name__)
 CORS(app)  # CORS 활성화
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 
-# OpenAI 클라이언트 초기화 부분 주석 처리 (테스트를 위해)
-# client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# OpenAI 클라이언트 초기화
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class BookstoreAPI:
     """문화공공데이터 API를 통해 카페가 있는 서점 정보를 가져오는 클래스"""
@@ -212,8 +213,8 @@ def search():
             
             print(f"API 검색 결과: {len(formatted_stores)}개 항목 찾음")
             
-            # AI 분석 비활성화
-            ai_analysis = "AI 분석 기능이 비활성화되었습니다. 검색 결과만 표시합니다."
+            # AI 분석 활성화
+            ai_analysis = get_ai_analysis(keyword, formatted_stores)
             
             return jsonify({
                 "stores": formatted_stores,
@@ -444,8 +445,40 @@ def get_dummy_data(keyword):
 
 def get_ai_analysis(keyword, stores):
     """AI 분석을 요청합니다."""
-    # AI 분석 비활성화
-    return "AI 분석 기능이 비활성화되었습니다."
+    try:
+        # OpenAI API 키가 설정되어 있지 않으면 기본 메시지 반환
+        if not os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY") == "your_openai_api_key_here":
+            return "AI 분석을 위해 OpenAI API 키가 필요합니다."
+        
+        # 검색 결과가 없으면 기본 메시지 반환
+        if not stores:
+            return f"'{keyword}'에 대한 검색 결과가 없습니다. 다른 키워드로 검색해보세요."
+        
+        # 서점 정보 텍스트 생성
+        store_info = "\n".join([
+            f"서점명: {store['title']}\n"
+            f"주소: {store['address']}\n"
+            f"설명: {store['description']}\n"
+            for store in stores[:3]  # 최대 3개까지만 분석
+        ])
+        
+        # AI 분석 요청
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "당신은 서점 추천 전문가입니다. 사용자에게 친근하고 유용한 정보를 제공해주세요."},
+                {"role": "user", "content": f"다음은 '{keyword}' 검색 결과로 나온 서점 목록입니다. 이 서점들의 특징을 분석하고, 어떤 사람들에게 추천할 만한지, 방문 시 팁이나 주변 정보도 알려주세요.\n\n{store_info}"}
+            ],
+            max_tokens=300,
+            temperature=0.7
+        )
+        
+        # 응답 반환
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        print(f"AI 분석 중 오류 발생: {str(e)}")
+        return f"AI 분석 중 오류가 발생했습니다: {str(e)}"
 
 @app.route('/exit')
 def exit_app():

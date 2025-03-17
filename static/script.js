@@ -129,6 +129,13 @@ document.addEventListener('DOMContentLoaded', function() {
         resultsContainer.classList.remove('d-none');
     }
 
+    // 주소에서 우편번호 제거 함수
+    function cleanAddress(address) {
+        // 우편번호 패턴 (숫자 5자리 또는 숫자-숫자 형태)
+        const zipCodePattern = /\b\d{5}\b|\b\d+-\d+\b/g;
+        return address.replace(zipCodePattern, '').trim();
+    }
+
     // 서점 카드 생성 함수
     function createStoreCard(store) {
         const col = document.createElement('div');
@@ -155,8 +162,11 @@ document.addEventListener('DOMContentLoaded', function() {
             addressLabel.className = 'store-info-label';
             addressLabel.innerHTML = '📍 주소: ';
             
+            // 우편번호 제거
+            const cleanedAddress = cleanAddress(store.address);
+            
             const addressLink = document.createElement('a');
-            addressLink.href = `https://map.naver.com/v5/search/${encodeURIComponent(store.address)}`;
+            addressLink.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedAddress)}`;
             addressLink.target = '_blank';
             addressLink.className = 'map-link';
             addressLink.textContent = store.address;
@@ -214,9 +224,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const mapButtonContainer = document.createElement('div');
             mapButtonContainer.className = 'mt-3';
             
+            // 우편번호 제거
+            const cleanedAddress = cleanAddress(store.address);
+            
             const mapButton = document.createElement('a');
             mapButton.className = 'btn btn-sm btn-success';
-            mapButton.href = `https://map.naver.com/v5/search/${encodeURIComponent(store.address)}`;
+            mapButton.href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanedAddress)}`;
             mapButton.target = '_blank';
             mapButton.innerHTML = '<i class="bi bi-map"></i> 네이버 지도에서 보기';
             
