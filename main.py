@@ -222,14 +222,25 @@ def search():
                 "data_source": "real_api"
             })
         else:
-            print(f"API 오류: {result['error']} - 더미 데이터로 폴백")
+            print(f"API 오류: {result['error']}")
+            # API 오류 시 오류 메시지 반환 (더미 데이터로 폴백하지 않음)
+            return jsonify({
+                "error": result["error"],
+                "suggestion": get_search_suggestion()
+            })
     else:
         print("더미 데이터 모드 활성화됨")
-    
-    # API 호출 실패 또는 더미 데이터 모드인 경우 더미 데이터 사용
-    dummy_data = get_dummy_data(keyword)
-    dummy_data["data_source"] = "dummy"
-    return jsonify(dummy_data)
+        # 더미 데이터 모드가 활성화된 경우 안내 메시지 반환
+        return jsonify({
+            "error": "현재 테스트 모드가 활성화되어 있습니다. 실시간 데이터를 보려면 관리자에게 문의하세요.",
+            "suggestion": {
+                "message": "실시간 API 데이터를 사용하려면 환경 설정을 변경해야 합니다.",
+                "examples": [
+                    "USE_DUMMY_DATA=false 설정 필요",
+                    "관리자에게 문의하세요."
+                ]
+            }
+        })
 
 def get_search_suggestion():
     """검색 제안을 반환합니다."""
